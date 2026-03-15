@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -8,9 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Search, UserMinus, UserCheck, ShieldAlert, Users, Clock, BrainCircuit, Loader2 } from 'lucide-react';
+import { Search, UserMinus, UserCheck, ShieldAlert, Users, Clock, BrainCircuit, Loader2, CalendarCheck } from 'lucide-react';
 import { MOCK_LOGS, MOCK_USERS } from '@/lib/data';
-import { subDays, subWeeks, subMonths, isAfter } from 'date-fns';
+import { subDays, subWeeks, subMonths, isAfter, isToday } from 'date-fns';
 import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from 'recharts';
 import { adminLibraryInsights, AdminLibraryInsightsOutput } from '@/ai/flows/admin-library-insights';
 import { useToast } from '@/hooks/use-toast';
@@ -19,11 +18,15 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState(MOCK_USERS);
   const [logs] = useState(MOCK_LOGS);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('attendance');
   const [timeFilter, setTimeFilter] = useState('day');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiInsights, setAiInsights] = useState<AdminLibraryInsightsOutput | null>(null);
   const { toast } = useToast();
+
+  const todayLogs = useMemo(() => {
+    return logs.filter(log => isToday(new Date(log.timestamp)));
+  }, [logs]);
 
   const filteredLogs = useMemo(() => {
     let baseDate = new Date();
@@ -112,7 +115,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Visitors" value={filteredLogs.length} icon={<Users className="w-5 h-5" />} description={`In the last ${timeFilter}`} />
+        <StatCard title="Today's Check-ins" value={todayLogs.length} icon={<CalendarCheck className="w-5 h-5" />} description="New visitors today" />
         <StatCard title="Peak Period" value={peakHourDisplay} icon={<Clock className="w-5 h-5" />} description="Busiest time slots" />
         <StatCard title="Active Users" value={users.filter(u => !u.isBlocked).length} icon={<UserCheck className="w-5 h-5" />} description="Non-blocked users" />
         <StatCard title="Blocked Users" value={users.filter(u => u.isBlocked).length} icon={<ShieldAlert className="w-5 h-5" />} description="Access denied" />
@@ -121,12 +124,13 @@ export default function AdminDashboard() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="flex items-center justify-between border-b pb-1">
           <TabsList className="bg-transparent h-auto p-0 space-x-6">
-            <TabsTrigger value="overview" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">Overview</TabsTrigger>
-            <TabsTrigger value="visitors" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">Recent Activity</TabsTrigger>
+            <TabsTrigger value="attendance" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">Daily Attendance</TabsTrigger>
+            <TabsTrigger value="overview" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">Statistics</TabsTrigger>
+            <TabsTrigger value="visitors" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">Activity Log</TabsTrigger>
             <TabsTrigger value="users" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">User Management</TabsTrigger>
           </TabsList>
           
-          {activeTab !== 'users' && (
+          {activeTab === 'visitors' && (
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-muted-foreground">Period:</span>
               <select 
@@ -141,6 +145,50 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
+
+        <TabsContent value="attendance" className="space-y-6">
+          <Card className="shadow-sm border-slate-200">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle className="text-lg">Daily Attendance</CardTitle>
+                <CardDescription>Students logged in today: {new Date().toLocaleDateString()}</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead>Student Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>College</TableHead>
+                    <TableHead>Reason</TableHead>
+                    <TableHead>Check-in Time</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {todayLogs.map((log) => (
+                    <TableRow key={log.id} className="group transition-colors">
+                      <TableCell className="font-semibold">{log.name}</TableCell>
+                      <TableCell className="text-slate-500">{log.email}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-normal text-slate-600 bg-slate-50">{log.college}</Badge>
+                      </TableCell>
+                      <TableCell>{log.reason}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {todayLogs.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">No students have checked in yet today.</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -209,8 +257,8 @@ export default function AdminDashboard() {
           <Card className="shadow-sm border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div>
-                <CardTitle className="text-lg">Visitor Records</CardTitle>
-                <CardDescription>History of library entries</CardDescription>
+                <CardTitle className="text-lg">Historical Activity Log</CardTitle>
+                <CardDescription>Complete history of library entries</CardDescription>
               </div>
               <div className="relative w-72">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />

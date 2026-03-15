@@ -15,15 +15,16 @@ LibFlow is a specialized visitor management and analytics platform designed for 
 - The system only accepts emails ending with `@neu.edu.ph`.
 - It utilizes Role-Based Access Control (RBAC):
   - **Students:** Access to the Check-in page.
-  - **Admins:** Access to the Full Dashboard and AI Insights.
+  - **Admins:** Access to the Full Dashboard, Daily Attendance, and AI Insights.
 
 ### 2. Smart Check-in Process
 - Automatically detects the student's name based on their email.
 - Students select their **College** and **Reason for Visit**.
-- Data is saved (simulated in prototype) for analytics.
+- Data is recorded for real-time tracking and historical analytics.
 
 ### 3. Admin Dashboard & Analytics
-- **Live Traffic:** Displays total visitors and distribution per college using Bar Charts.
+- **Daily Attendance:** View a live list of students currently checked in for the day.
+- **Live Traffic:** Displays distribution per college using Bar Charts.
 - **Dynamic Peak Hours:** Uses an algorithm to calculate which hour has the highest library traffic.
 - **User Management:** Allows admins to block users who violate rules.
 

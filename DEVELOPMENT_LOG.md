@@ -17,7 +17,7 @@ This document tracks the versions, bugs, and resolutions throughout the developm
 ### v0.3.0 - AI & Security Update
 - Integrated **Genkit** for automated library insights.
 - Added `.gitignore` to secure sensitive files.
-- Connected to GitHub for version control.
+- Added **Daily Attendance** tracking for real-time monitoring.
 
 ## 🐛 Bug Tracker & Resolutions
 

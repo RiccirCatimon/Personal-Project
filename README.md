@@ -16,7 +16,7 @@ LibFlow is a specialized visitor management and analytics platform designed for 
 - `src/ai/`: Generative AI logic, including Genkit flows for library data analysis.
 - `src/lib/`: Core utilities, mock data, and TypeScript type definitions.
 - `src/hooks/`: Custom React hooks for managing state and UI interactions.
-- `DEVELOPMENT_LOG.md`: Technical version history, security policies, and critical "READ ME" info.
+- `DEVELOPMENT_LOG.md`: Technical version history, security policies, and critical "PLEASE READ ME" info.
 - `push.sh`: Specialized script for automated and secure synchronization with GitHub.
 
 ## 📖 How it Works
@@ -33,4 +33,4 @@ LibFlow is a specialized visitor management and analytics platform designed for 
 - Uses **Gemini 2.5 Flash** to analyze logs and provide peak usage recommendations.
 
 ---
-© 2024 New Era University Library | Developed by Riccir Catimon
+© 2025 New Era University Library | Developed by Riccir Catimon

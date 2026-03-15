@@ -4,9 +4,6 @@
 # Script to manually push updates to GitHub with uniform messaging
 echo "🚀 Starting professional synchronization..."
 
-# Ensure the script is executable
-# chmod +x push.sh
-
 # Add all changes
 git add .
 

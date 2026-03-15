@@ -76,9 +76,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  // During build/prerender, context might be undefined if not wrapped properly
-  // but since we wrap in layout, this should only happen if hooks are used incorrectly.
-  if (context === undefined) {
+  // During build/prerender, context might be undefined. 
+  // We return a safe default instead of throwing to prevent build failures.
+  if (!context) {
     return {
       user: null,
       login: async () => ({ success: false, message: "Context not found" }),

@@ -28,7 +28,7 @@
 
 ### 1. Prerender Error (Build Failed)
 - **Issue:** Next.js build failed because `/check-in` was accessed outside of its context provider during static generation.
-- **Resolution:** Ensured the root layout correctly wraps all children and added safety checks to the `useAuth` hook.
+- **Resolution:** Ensured the `useAuth` hook returns a safe default state when context is missing.
 
 ### 2. The "Hardcoded Stats" Bug
 - **Issue:** Peak hours were static and didn't change with new data.

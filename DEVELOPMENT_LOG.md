@@ -10,33 +10,21 @@
 
 ## 📅 Version History
 
+### v0.5.0 - Documentation Standardization
+- **Date:** 2025-02-20
+- **Update:** Standardized all project labels and documentation for a uniform look.
+- **Fix:** Added clear file descriptions to the main README.
+- **Status:** Stable.
+
 ### v0.4.6 - Push Logic & Document Refinement
 - **Date:** 2025-02-20
 - **Update:** Refined the "Big READ ME" header for maximum visibility.
 - **Fix:** Updated the manual push script to handle branch tracking issues.
-- **Status:** Ready for manual GitHub push.
 
 ### v0.4.5 - Manual Sync & Header Refinement
 - **Date:** 2025-02-20
 - **Update:** Refined the "Big READ ME" header for maximum visibility and updated last modified date.
 - **Fix:** Ensured all deployment-critical fixes (AuthProvider placement) are included in the manual sync.
-
-### v0.4.4 - Manual Sync & Header Refinement
-- **Date:** 2025-02-20
-- **Update:** Refined the "Big READ ME" header for maximum visibility.
-- **Fix:** Ensured all deployment-critical fixes (AuthProvider placement) are included in the manual sync.
-
-### v0.4.3 - Final GitHub Sync & Header Update
-- **Date:** 2025-02-19
-- **Update:** Enhanced the "Big READ ME" header for maximum visibility.
-- **Fix:** Confirmed global AuthProvider placement for stable Vercel deployments.
-- **UI:** Verified original card-based login design is active.
-
-### v0.4.0 - Access Control & Admin Refinement
-- **Role-Based Access Control (RBAC):** Restricted Admin Dashboard access exclusively to `riccir.catimon@neu.edu.ph`.
-- **Student Access:** Enabled login for all students using valid `@neu.edu.ph` institutional emails for check-in purposes.
-- **Daily Attendance:** Implemented a dedicated tab to monitor all student entries for the current day.
-- **Documentation:** Fully translated all system logs and README files to English.
 
 ---
 
@@ -44,11 +32,11 @@
 
 ### 1. Prerender Error (Build Failed)
 - **Issue:** Next.js build failed because `/check-in` was accessed outside of its context provider.
-- **Resolution:** Moved `AuthProvider` to `layout.tsx` to wrap all application routes. This ensures the authentication context is available during the static generation phase.
+- **Resolution:** Moved `AuthProvider` to `layout.tsx` to wrap all application routes.
 
 ### 2. The "Hardcoded Stats" Bug
 - **Issue:** Peak hours were static and didn't change with new data.
-- **Resolution:** Implemented `useMemo` with a frequency mapping algorithm to calculate the mode of visitor timestamps.
+- **Resolution:** Implemented `useMemo` with a frequency mapping algorithm.
 
 ---
 *Last Updated: 2025-02-20*

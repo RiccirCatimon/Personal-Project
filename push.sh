@@ -1,16 +1,16 @@
+
 #!/bin/bash
 
-# Script to manually push updates to GitHub
-echo "🚀 Starting manual push to GitHub..."
+# Script to manually push updates to GitHub with uniform messaging
+echo "🚀 Starting professional synchronization..."
 
 # Add all changes
 git add .
 
-# Commit with a descriptive message
-# We use || true to prevent the script from stopping if there are no changes to commit
-git commit -m "chore: update documentation and apply deployment fixes" || true
+# Commit with a uniform, professional message
+git commit -m "chore: synchronize system documentation and core application logic" || true
 
-# Push to the current branch and set it as upstream to fix the error you saw
+# Push to the current branch
 git push --set-upstream origin main
 
-echo "✅ Successfully pushed to GitHub!"
+echo "✅ Successfully updated GitHub repository!"

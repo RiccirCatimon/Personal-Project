@@ -19,31 +19,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    const institutionalRegex = /^[a-zA-Z0-9._%+-]+@neu\.edu\.ph$/;
-    if (!institutionalRegex.test(email)) {
-      return { success: false, message: "Please use your institutional NEU email." };
+    const targetEmail = 'riccir.catimon@neu.edu.ph';
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Strict access restriction
+    if (normalizedEmail !== targetEmail) {
+      return { 
+        success: false, 
+        message: "Access restricted. Only the project owner (riccir.catimon@neu.edu.ph) is authorized to log in." 
+      };
     }
 
-    const foundUser = MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const foundUser = MOCK_USERS.find(u => u.email.toLowerCase() === normalizedEmail);
     
     if (foundUser?.isBlocked) {
-      return { success: false, message: "Your account has been blocked. Please contact the administrator." };
+      return { success: false, message: "Your account has been blocked. Please contact system support." };
     }
 
     if (foundUser) {
       setUser(foundUser);
-      return { success: true, message: `Welcome, to NEU Library!` };
+      return { success: true, message: `Welcome back, Admin Riccir!` };
     } else {
-      // Auto-register as standard user if not found but valid email
+      // Fallback in case user is valid but not in initial mock list
       const newUser: UserAccount = {
-        email,
-        name: email.split('@')[0].split('.').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
-        role: 'user',
+        email: normalizedEmail,
+        name: 'Riccir Catimon',
+        role: 'admin',
         isBlocked: false,
-        college: 'Education' // Default
+        college: 'Engineering'
       };
       setUser(newUser);
-      return { success: true, message: `Welcome, to NEU Library!` };
+      return { success: true, message: `Welcome back, Admin Riccir!` };
     }
   };
 

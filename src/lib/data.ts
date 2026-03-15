@@ -20,10 +20,10 @@ export interface VisitorLog {
   timestamp: string;
 }
 
-// Simulated data
+// Simulated data - Primary Admin updated to requested email
 export const MOCK_USERS: UserAccount[] = [
-  { email: 'admin@neu.edu.ph', name: 'Super Admin', role: 'admin', isBlocked: false },
-  { email: 'john.doe@neu.edu.ph', name: 'John Doe', role: 'user', isBlocked: false, college: 'Engineering' },
+  { email: 'riccir.catimon@neu.edu.ph', name: 'Riccir Catimon', role: 'admin', isBlocked: false },
+  { email: 'student.sample@neu.edu.ph', name: 'Sample Student', role: 'user', isBlocked: false, college: 'Engineering' },
   { email: 'jane.smith@neu.edu.ph', name: 'Jane Smith', role: 'user', isBlocked: false, college: 'Business' },
   { email: 'mark.lee@neu.edu.ph', name: 'Mark Lee', role: 'user', isBlocked: true, college: 'Arts and Sciences' },
 ];

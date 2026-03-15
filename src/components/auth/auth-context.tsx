@@ -19,37 +19,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    const targetEmail = 'riccir.catimon@neu.edu.ph';
     const normalizedEmail = email.toLowerCase().trim();
+    const adminEmail = 'riccir.catimon@neu.edu.ph';
 
-    // Strict access restriction
-    if (normalizedEmail !== targetEmail) {
+    // Verify institutional email domain
+    if (!normalizedEmail.endsWith('@neu.edu.ph')) {
       return { 
         success: false, 
-        message: "Access restricted. Only the project owner (riccir.catimon@neu.edu.ph) is authorized to log in." 
+        message: "Access denied. Please use your official @neu.edu.ph institutional email." 
       };
     }
 
     const foundUser = MOCK_USERS.find(u => u.email.toLowerCase() === normalizedEmail);
     
     if (foundUser?.isBlocked) {
-      return { success: false, message: "Your account has been blocked. Please contact system support." };
+      return { success: false, message: "Your account has been blocked. Please contact the library administration." };
     }
 
     if (foundUser) {
       setUser(foundUser);
-      return { success: true, message: `Welcome back, Admin Riccir!` };
+      return { success: true, message: `Welcome back, ${foundUser.name}!` };
     } else {
-      // Fallback in case user is valid but not in initial mock list
+      // Create a temporary session for valid NEU emails not in the mock list
       const newUser: UserAccount = {
         email: normalizedEmail,
-        name: 'Riccir Catimon',
-        role: 'admin',
+        name: normalizedEmail.split('@')[0].split('.').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' '),
+        role: normalizedEmail === adminEmail ? 'admin' : 'user',
         isBlocked: false,
-        college: 'Engineering'
+        college: 'General Education'
       };
       setUser(newUser);
-      return { success: true, message: `Welcome back, Admin Riccir!` };
+      return { success: true, message: `Welcome to LibFlow, ${newUser.name}!` };
     }
   };
 

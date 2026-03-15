@@ -1,3 +1,4 @@
+
 # LibFlow Development Log
 
 This document tracks the versions, bugs, and resolutions throughout the development of the LibFlow system.
@@ -18,6 +19,11 @@ This document tracks the versions, bugs, and resolutions throughout the developm
 - Integrated **Genkit** for automated library insights.
 - Added `.gitignore` to secure sensitive files.
 - Added **Daily Attendance** tracking for real-time monitoring.
+
+### v0.4.0 - Access Control Refinement
+- Restricted **Admin Dashboard** access exclusively to `riccir.catimon@neu.edu.ph`.
+- Enabled login for all students using valid `@neu.edu.ph` institutional emails.
+- Updated documentation and development log to English.
 
 ## 🐛 Bug Tracker & Resolutions
 

@@ -30,10 +30,7 @@ LibFlow is a specialized visitor management and analytics platform designed for 
 
 ### 4. AI Insights (Genkit)
 - Uses **Gemini 2.5 Flash** to analyze visitor logs.
-- The AI provides:
-  - Peak usage trends.
-  - Actionable recommendations (e.g., "Increase staff during 2 PM - 4 PM").
-  - College-specific patterns.
+- The AI provides peak usage trends and actionable recommendations for library staff.
 
 ## 🚀 Setup Guide
 
@@ -52,7 +49,6 @@ LibFlow is a specialized visitor management and analytics platform designed for 
    ```bash
    npm run dev
    ```
-   Open [http://localhost:9002](http://localhost:9002) in your browser.
 
 ---
 © 2024 New Era University Library | Developed by Riccir Catimon

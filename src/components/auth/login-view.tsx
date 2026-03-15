@@ -38,7 +38,7 @@ export function LoginView() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50">
-      <div className="text-center mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
+      <div className="text-center mb-8">
         <div className="mx-auto bg-primary w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg mb-4">
           <BookOpen className="text-white w-8 h-8" />
         </div>
@@ -50,7 +50,7 @@ export function LoginView() {
         </p>
       </div>
 
-      <Card className="w-full max-w-md shadow-xl border-slate-200 animate-in zoom-in-95 duration-500">
+      <Card className="w-full max-w-md shadow-xl border-slate-200">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl">Sign In</CardTitle>
           <CardDescription>

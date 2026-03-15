@@ -4,10 +4,17 @@
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
 **Access Policy:** Only institutional emails (@neu.edu.ph) are permitted.
+**Security:** Admin features are strictly locked to the Primary Admin email.
 
 ---
 
 ## 📅 Version History
+
+### v0.4.2 - Deployment & Documentation Finalization
+- **Date:** 2025-02-18
+- **Fix:** Verified global AuthProvider placement for stable Vercel deployments.
+- **UI:** Confirmed original card-based login design is active.
+- **Header:** Added prominent "READ ME" for immediate system clarity on GitHub.
 
 ### v0.4.1 - Build & Deployment Fix
 - **Fix:** Resolved Vercel prerender error by moving `AuthProvider` to the root layout.
@@ -45,4 +52,4 @@
 - **Resolution:** Implemented `useMemo` with a frequency mapping algorithm to calculate the mode of visitor timestamps.
 
 ---
-*Last Updated: 2024-10-26*
+*Last Updated: 2025-02-18*

@@ -23,7 +23,7 @@ This document tracks the versions, bugs, and resolutions throughout the developm
 ### v0.4.0 - Access Control Refinement
 - Restricted **Admin Dashboard** access exclusively to `riccir.catimon@neu.edu.ph`.
 - Enabled login for all students using valid `@neu.edu.ph` institutional emails.
-- Updated documentation and development log to English.
+- Updated all system documentation and logs to English for professional standards.
 
 ## 🐛 Bug Tracker & Resolutions
 

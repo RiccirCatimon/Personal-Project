@@ -14,8 +14,8 @@ LibFlow is a specialized visitor management and analytics platform designed for 
 ### 1. Authentication & Security
 - The system only accepts emails ending with `@neu.edu.ph`.
 - It utilizes Role-Based Access Control (RBAC):
-  - **Students:** Access to the Check-in page.
-  - **Admins:** Access to the Full Dashboard, Daily Attendance, and AI Insights.
+  - **Students:** Can log in with any valid NEU email to access the Check-in page.
+  - **Admins:** Access to the Full Dashboard, Daily Attendance, and AI Insights is strictly limited to `riccir.catimon@neu.edu.ph`.
 
 ### 2. Smart Check-in Process
 - Automatically detects the student's name based on their email.

@@ -1,4 +1,5 @@
-# ⚠️ READ ME: SYSTEM INFORMATION & DEVELOPMENT LOG
+# 🛑 IMPORTANT: READ ME - SYSTEM ACCESS & INFO 🛑
+
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
 **Access Policy:** Only institutional emails (@neu.edu.ph) are permitted.
@@ -7,7 +8,7 @@
 
 ## 📅 Version History
 
-### v0.4.0 - Access Control & Admin Refinement (Current)
+### v0.4.0 - Access Control & Admin Refinement
 - **Role-Based Access Control (RBAC):** Restricted Admin Dashboard access exclusively to `riccir.catimon@neu.edu.ph`.
 - **Student Access:** Enabled login for all students using valid `@neu.edu.ph` institutional emails for check-in purposes.
 - **Daily Attendance:** Implemented a dedicated tab to monitor all student entries for the current day.

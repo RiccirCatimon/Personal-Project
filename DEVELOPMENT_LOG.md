@@ -10,20 +10,17 @@
 
 ## 📅 Version History
 
+### v0.4.4 - Manual Sync & Header Refinement
+- **Date:** 2025-02-20
+- **Update:** Refined the "Big READ ME" header for maximum visibility.
+- **Fix:** Ensured all deployment-critical fixes (AuthProvider placement) are included in the manual sync.
+- **Status:** Ready for manual GitHub push.
+
 ### v0.4.3 - Final GitHub Sync & Header Update
 - **Date:** 2025-02-19
 - **Update:** Enhanced the "Big READ ME" header for maximum visibility.
 - **Fix:** Confirmed global AuthProvider placement for stable Vercel deployments.
 - **UI:** Verified original card-based login design is active.
-
-### v0.4.2 - Deployment & Documentation Finalization
-- **Date:** 2025-02-18
-- **Fix:** Verified global AuthProvider placement for stable Vercel deployments.
-- **UI:** Confirmed original card-based login design is active.
-
-### v0.4.1 - Build & Deployment Fix
-- **Fix:** Resolved Vercel prerender error by moving `AuthProvider` to the root layout.
-- **UI:** Restored original card-based login design.
 
 ### v0.4.0 - Access Control & Admin Refinement
 - **Role-Based Access Control (RBAC):** Restricted Admin Dashboard access exclusively to `riccir.catimon@neu.edu.ph`.
@@ -44,4 +41,4 @@
 - **Resolution:** Implemented `useMemo` with a frequency mapping algorithm to calculate the mode of visitor timestamps.
 
 ---
-*Last Updated: 2025-02-19*
+*Last Updated: 2025-02-20*

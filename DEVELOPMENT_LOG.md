@@ -1,5 +1,5 @@
 
-# 🚨🚨🚨 IMPORTANT: READ ME - SYSTEM ACCESS & INFO 🚨🚨🚨
+# 🚨 PLEASE READ ME 🚨
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
@@ -10,21 +10,21 @@
 
 ## 📅 Version History
 
+### v0.5.1 - Documentation Refinement
+- **Date:** 2025-02-20
+- **Update:** Simplified headers and standardized project labeling.
+- **Fix:** Refined the "PLEASE READ ME" visibility for easier access.
+- **Status:** Stable.
+
 ### v0.5.0 - Documentation Standardization
 - **Date:** 2025-02-20
 - **Update:** Standardized all project labels and documentation for a uniform look.
 - **Fix:** Added clear file descriptions to the main README.
-- **Status:** Stable.
 
-### v0.4.6 - Push Logic & Document Refinement
-- **Date:** 2025-02-20
-- **Update:** Refined the "Big READ ME" header for maximum visibility.
-- **Fix:** Updated the manual push script to handle branch tracking issues.
-
-### v0.4.5 - Manual Sync & Header Refinement
-- **Date:** 2025-02-20
-- **Update:** Refined the "Big READ ME" header for maximum visibility and updated last modified date.
-- **Fix:** Ensured all deployment-critical fixes (AuthProvider placement) are included in the manual sync.
+### v0.4.5 - Auth & Deployment Fix
+- **Date:** 2025-02-19
+- **Update:** Moved AuthProvider to root layout to resolve Vercel prerender errors.
+- **Fix:** Ensured context is available across all routes during build.
 
 ---
 

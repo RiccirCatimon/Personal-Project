@@ -10,12 +10,12 @@ LibFlow is a specialized visitor management and analytics platform designed for 
 - **Data Handling:** React Hooks & Date-fns
 
 ## 📂 Project Structure
-- `src/app/`: Contains the main page routes and application views.
-- `src/components/`: Reusable UI elements, navigation, and authentication views.
-- `src/ai/`: Genkit AI flow definitions for intelligent library insights.
-- `src/lib/`: Shared utility functions, types, and system mock data.
-- `DEVELOPMENT_LOG.md`: A detailed record of all updates, security policies, and bug fixes.
-- `push.sh`: A specialized automation script for secure GitHub synchronization.
+- `src/app/`: Primary application routes and page layouts.
+- `src/components/`: Reusable interface components and authentication logic.
+- `src/ai/`: Artificial Intelligence logic and Genkit flow definitions.
+- `src/lib/`: Core utilities, TypeScript types, and system data.
+- `DEVELOPMENT_LOG.md`: Technical history, security policies, and critical info.
+- `push.sh`: Specialized script for automated and secure repository synchronization.
 
 ## 📖 How it Works
 

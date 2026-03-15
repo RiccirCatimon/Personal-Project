@@ -1,7 +1,7 @@
 
 'use client';
 
-import { AuthProvider, useAuth } from '@/components/auth/auth-context';
+import { useAuth } from '@/components/auth/auth-context';
 import { LoginView } from '@/components/auth/login-view';
 import { Navbar } from '@/components/navbar';
 import AdminDashboard from '@/app/admin/page';
@@ -25,9 +25,5 @@ function AppContent() {
 }
 
 export default function Home() {
-  return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
-  );
+  return <AppContent />;
 }

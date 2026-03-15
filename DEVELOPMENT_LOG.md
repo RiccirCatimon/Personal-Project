@@ -1,3 +1,4 @@
+
 # 🛑 IMPORTANT: READ ME - SYSTEM ACCESS & INFO 🛑
 
 **Project:** LibFlow | NEU Library Visitor Management
@@ -7,6 +8,10 @@
 ---
 
 ## 📅 Version History
+
+### v0.4.1 - Build & Deployment Fix
+- **Fix:** Resolved Vercel prerender error by moving `AuthProvider` to the root layout.
+- **UI:** Restored original card-based login design.
 
 ### v0.4.0 - Access Control & Admin Refinement
 - **Role-Based Access Control (RBAC):** Restricted Admin Dashboard access exclusively to `riccir.catimon@neu.edu.ph`.
@@ -31,21 +36,13 @@
 
 ## 🐛 Bug Tracker & Resolutions
 
-### 1. The "Hardcoded Stats" Bug
+### 1. Prerender Error (Build Failed)
+- **Issue:** Next.js build failed because `/check-in` was accessed outside of its context provider.
+- **Resolution:** Moved `AuthProvider` to `layout.tsx` to wrap all application routes.
+
+### 2. The "Hardcoded Stats" Bug
 - **Issue:** Peak hours were static and didn't change with new data.
 - **Resolution:** Implemented `useMemo` with a frequency mapping algorithm to calculate the mode of visitor timestamps.
-
-### 2. The ".env Security Leak"
-- **Issue:** Private API keys were visible on GitHub.
-- **Resolution:** Added `.env` to `.gitignore` and performed a `git rm --cached` to purge the history.
-
-### 3. AI Schema Mismatch
-- **Issue:** AI output format was inconsistent.
-- **Resolution:** Defined a strict **Zod Schema** in the Genkit flow to ensure the UI receives valid JSON.
-
-### 4. Hydration Error
-- **Issue:** Server and client time discrepancies caused React errors.
-- **Resolution:** Used `useEffect` hooks to ensure time-sensitive components only render on the client side.
 
 ---
 *Last Updated: 2024-10-26*

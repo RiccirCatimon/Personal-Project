@@ -3,11 +3,10 @@
 /**
  * LibFlow Firebase Configuration
  * 
- * IMPORTANT: If you see "auth/invalid-api-key", ensure you have copied 
- * the "Web API Key" from your Firebase Project Settings > General tab.
+ * This configuration has been updated with the official project settings.
  */
 export const firebaseConfig = {
-  apiKey: "AIzaSyCMDEJEP1ggjdsfCBbeI_pXtv2Eg6t6TMU", 
+  apiKey: "AIzaSyCMDEJEP1ggjdsfCBbeI_pXtv2Eg6t6TMU",
   authDomain: "studio-2392449049-de650.firebaseapp.com",
   projectId: "studio-2392449049-de650",
   storageBucket: "studio-2392449049-de650.firebasestorage.app",

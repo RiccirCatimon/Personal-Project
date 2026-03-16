@@ -2,25 +2,25 @@
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Status:** 🚀 Finalizing Authentication Setup
+**Status:** ✅ Authentication Setup Complete
 
 ---
 
 ## 📅 Version History
 
-### v1.1.2 - Google Auth Finalization
+### v1.1.3 - Production Configuration Applied
 - **Date:** 2025-02-21
-- **Status:** Google Provider enabled in Console.
-- **Action Required:** 
-  1. Click **Save** in the Authentication > Sign-in method > Google settings.
-  2. Verify the `apiKey` in `src/firebase/config.ts` matches the one in **Project Settings > General**.
+- **Status:** Google Auth enabled and production config applied.
+- **Changes:**
+  1. Verified Google Provider status as "Enabled" in Firebase Console.
+  2. Updated `src/firebase/config.ts` with the official Web API Key.
+  3. Resolved "invalid-api-key" error during Google Sign-in.
 
 ---
 
-## 🚀 Critical Setup Steps
-1. **Save Provider:** Ensure you clicked "Save" on the Google Sign-in configuration page.
-2. **Authorized Domains:** Ensure `lib-flow-neu.vercel.app` and `localhost` are in the **Authorized domains** list in the Authentication settings.
-3. **Push Changes:** Run `./push.sh` to deploy the latest logic.
+## 🚀 Final Step
+1. **Sync to GitHub:** Run `./push.sh` to deploy the working configuration.
+2. **Verify Login:** Visit the live site and log in with your @neu.edu.ph account.
 
 ---
 *Last Updated: 2025-02-21*

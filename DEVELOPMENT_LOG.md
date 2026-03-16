@@ -1,12 +1,21 @@
+
 # PLEASE READ ME
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Status:** ✅ Deployment Sync (v1.2.6)
+**Status:** ✅ Deployment Sync (v1.2.7)
 
 ---
 
 ## 📅 Version History
+
+### v1.2.7 - Advanced Analytics & Range Filtering
+- **Date:** 2025-02-21
+- **Status:** Enhanced Admin Dashboard with custom date range filtering.
+- **Completed:** 
+  1. Added `react-day-picker` integration for custom date range selection in Admin.
+  2. Updated statistics cards to reflect granular filtered data (Peak Hour, Role distribution).
+  3. Improved UI responsiveness of the filtering system.
 
 ### v1.2.6 - Institutional Access Restriction
 - **Date:** 2025-02-21
@@ -24,19 +33,12 @@
   2. Hardcoded `jcesperanza@neu.edu.ph` as a Primary Administrator.
   3. Final sync of project documentation.
 
-### v1.2.4 - Final Domain Verification
-- **Date:** 2025-02-21
-- **Status:** Resolving auth/unauthorized-domain.
-- **Completed:** 
-  1. Confirmed domain settings for Firebase.
-  2. Final sync of verified Firebase credentials.
-
 ---
 
 ## 🚀 POST-DEPLOYMENT NOTES:
 - The system is now fully synchronized with Firebase.
 - Only users with verified **@neu.edu.ph** email addresses can access the system.
-- Primary admins (`jcesperanza@neu.edu.ph` and `riccir.catimon@neu.edu.ph`) have full access to the Admin Dashboard.
+- Primary admins have full access to the Admin Dashboard with custom date range reporting.
 - Users can check-in at https://library-proj-ten.vercel.app.
 
 ---

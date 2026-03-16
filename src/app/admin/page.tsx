@@ -10,19 +10,24 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Search, Clock, BrainCircuit, Loader2, CalendarCheck, Filter, User, ShieldAlert } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { Search, Clock, BrainCircuit, Loader2, CalendarCheck, Filter, User, ShieldAlert, Calendar as CalendarIcon } from 'lucide-react';
 import { REASONS, COLLEGES, VisitorLog } from '@/lib/data';
-import { subDays, subWeeks, subMonths, isAfter, isToday } from 'date-fns';
+import { subDays, subWeeks, subMonths, isAfter, isBefore, isToday, format, startOfDay, endOfDay } from 'date-fns';
 import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from 'recharts';
 import { adminLibraryInsights, AdminLibraryInsightsOutput } from '@/ai/flows/admin-library-insights';
 import { useToast } from '@/hooks/use-toast';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { useFirestore, useCollection } from '@/firebase';
+import { cn } from '@/lib/utils';
 
 export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('attendance');
   const [timeFilter, setTimeFilter] = useState('day');
+  const [startDate, setStartDate] = useState<Date | undefined>(subDays(new Date(), 7));
+  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
   const [reasonFilter, setReasonFilter] = useState('all');
   const [collegeFilter, setCollegeFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -39,17 +44,22 @@ export default function AdminDashboard() {
   const { data: logs, loading } = useCollection<VisitorLog>(visitorLogsQuery);
 
   const filteredLogs = useMemo(() => {
-    let baseDate = new Date();
-    if (timeFilter === 'day') baseDate = subDays(new Date(), 1);
-    else if (timeFilter === 'week') baseDate = subWeeks(new Date(), 1);
-    else if (timeFilter === 'month') baseDate = subMonths(new Date(), 1);
-
     return (logs || []).filter(log => {
       const matchesSearch = log.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            log.email.toLowerCase().includes(searchQuery.toLowerCase());
       
       const logDate = new Date(log.timestamp);
-      const matchesTime = isAfter(logDate, baseDate);
+      let matchesTime = true;
+
+      if (timeFilter === 'day') {
+        matchesTime = isAfter(logDate, startOfDay(new Date()));
+      } else if (timeFilter === 'week') {
+        matchesTime = isAfter(logDate, subWeeks(new Date(), 1));
+      } else if (timeFilter === 'month') {
+        matchesTime = isAfter(logDate, subMonths(new Date(), 1));
+      } else if (timeFilter === 'range' && startDate && endDate) {
+        matchesTime = isAfter(logDate, startOfDay(startDate)) && isBefore(logDate, endOfDay(endDate));
+      }
       
       const matchesReason = reasonFilter === 'all' || log.reason === reasonFilter;
       const matchesCollege = collegeFilter === 'all' || log.college === collegeFilter;
@@ -59,7 +69,7 @@ export default function AdminDashboard() {
 
       return matchesSearch && matchesTime && matchesReason && matchesCollege && matchesType;
     });
-  }, [logs, searchQuery, timeFilter, reasonFilter, collegeFilter, typeFilter]);
+  }, [logs, searchQuery, timeFilter, startDate, endDate, reasonFilter, collegeFilter, typeFilter]);
 
   const stats = useMemo(() => {
     const today = (logs || []).filter(l => isToday(new Date(l.timestamp))).length;
@@ -136,10 +146,10 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Today's Total" value={stats.today} icon={<CalendarCheck className="w-5 h-5" />} description="New visitors today" />
-        <StatCard title="Peak Hour" value={stats.peakStr} icon={<Clock className="w-5 h-5" />} description="Busiest time" />
-        <StatCard title="Students" value={stats.students} icon={<User className="w-5 h-5" />} description="Filtered students" />
-        <StatCard title="Employees" value={stats.employees} icon={<ShieldAlert className="w-5 h-5" />} description="Faculty & Staff" />
+        <StatCard title="Today's Total" value={stats.today} icon={<CalendarCheck className="w-5 h-5" />} description="Total check-ins today" />
+        <StatCard title="Peak Hour" value={stats.peakStr} icon={<Clock className="w-5 h-5" />} description="Busiest period for selected filters" />
+        <StatCard title="Students" value={stats.students} icon={<User className="w-5 h-5" />} description="Student visitors in selection" />
+        <StatCard title="Employees" value={stats.employees} icon={<ShieldAlert className="w-5 h-5" />} description="Faculty/Staff in selection" />
       </div>
 
       <Card className="border-slate-200 shadow-sm overflow-hidden">
@@ -150,44 +160,81 @@ export default function AdminDashboard() {
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-slate-500 uppercase">Range</Label>
+              <Label className="text-xs font-bold text-slate-500 uppercase">Time Period</Label>
               <Select value={timeFilter} onValueChange={setTimeFilter}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="day">Day</SelectItem>
-                  <SelectItem value="week">Week</SelectItem>
-                  <SelectItem value="month">Month</SelectItem>
+                  <SelectItem value="day">Today</SelectItem>
+                  <SelectItem value="week">Past Week</SelectItem>
+                  <SelectItem value="month">Past Month</SelectItem>
+                  <SelectItem value="range">Custom Range</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
+            {timeFilter === 'range' && (
+              <div className="lg:col-span-2 grid grid-cols-2 gap-2">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-slate-500 uppercase">From</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !startDate && "text-muted-foreground")}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold text-slate-500 uppercase">To</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !endDate && "text-muted-foreground")}>
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label className="text-xs font-bold text-slate-500 uppercase">College</Label>
               <Select value={collegeFilter} onValueChange={setCollegeFilter}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="all">All Colleges</SelectItem>
                   {COLLEGES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
               <Label className="text-xs font-bold text-slate-500 uppercase">Reason</Label>
               <Select value={reasonFilter} onValueChange={setReasonFilter}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="all">All Reasons</SelectItem>
                   {REASONS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-slate-500 uppercase">Type</Label>
+              <Label className="text-xs font-bold text-slate-500 uppercase">Visitor Type</Label>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="student">Student</SelectItem>
                   <SelectItem value="employee">Employee</SelectItem>
                 </SelectContent>
@@ -199,21 +246,21 @@ export default function AdminDashboard() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="bg-white border p-1 h-auto space-x-1 shadow-sm">
-          <TabsTrigger value="attendance" className="data-[state=active]:bg-primary data-[state=active]:text-white">Attendance</TabsTrigger>
-          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-white">Statistics</TabsTrigger>
+          <TabsTrigger value="attendance" className="data-[state=active]:bg-primary data-[state=active]:text-white">Attendance Log</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-white">Data Visualization</TabsTrigger>
         </TabsList>
 
         <TabsContent value="attendance">
           <Card className="shadow-sm border-slate-200">
             <CardHeader className="flex flex-row items-center justify-between pb-4">
               <div>
-                <CardTitle className="text-lg">Visitor Log</CardTitle>
-                <CardDescription>{filteredLogs.length} matching records</CardDescription>
+                <CardTitle className="text-lg">Detailed Logs</CardTitle>
+                <CardDescription>{filteredLogs.length} matching records found</CardDescription>
               </div>
               <div className="relative w-64">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="Search..." 
+                  placeholder="Search name or email..." 
                   className="pl-10" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -224,11 +271,11 @@ export default function AdminDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-slate-50/50">
-                    <TableHead>Visitor</TableHead>
+                    <TableHead>Visitor Name</TableHead>
                     <TableHead>Affiliation</TableHead>
                     <TableHead>Reason</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Timestamp</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Check-in Time</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -250,13 +297,13 @@ export default function AdminDashboard() {
                         )}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
-                        {new Date(log.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                        {format(new Date(log.timestamp), "MMM d, yyyy h:mm a")}
                       </TableCell>
                     </TableRow>
                   ))}
                   {filteredLogs.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">No records found.</TableCell>
+                      <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">No records match the current filters.</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -269,7 +316,8 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2 shadow-sm border-slate-200">
               <CardHeader>
-                <CardTitle className="text-lg">College Distribution</CardTitle>
+                <CardTitle className="text-lg">Distribution by College</CardTitle>
+                <CardDescription>Number of visits per college for the selected period</CardDescription>
               </CardHeader>
               <CardContent className="h-[350px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -286,23 +334,26 @@ export default function AdminDashboard() {
 
             <Card className="shadow-sm border-slate-200">
               <CardHeader>
-                <CardTitle className="text-lg">AI Insights</CardTitle>
+                <CardTitle className="text-lg">AI Smart Insights</CardTitle>
+                <CardDescription>Generated patterns from recent traffic</CardDescription>
               </CardHeader>
               <CardContent>
                 {aiInsights ? (
                   <div className="space-y-4 text-sm">
                     <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
                       <p className="font-semibold text-primary mb-1">Summary</p>
-                      <p className="text-slate-600">{aiInsights.overallSummary}</p>
+                      <p className="text-slate-600 leading-relaxed">{aiInsights.overallSummary}</p>
                     </div>
-                    <Button variant="outline" className="w-full" onClick={() => setAiInsights(null)}>Clear</Button>
+                    <Button variant="outline" className="w-full" onClick={() => setAiInsights(null)}>Clear Report</Button>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-[280px] text-center p-6 border-2 border-dashed rounded-xl bg-slate-50">
                     <BrainCircuit className="w-12 h-12 text-slate-300 mb-4" />
-                    <p className="text-slate-500 mb-6 text-sm">Generate AI patterns from latest data.</p>
+                    <p className="text-slate-500 mb-6 text-sm font-medium">Generate AI trends and resource recommendations from latest logs.</p>
                     <Button onClick={handleRunAI} disabled={isAnalyzing}>
-                      {isAnalyzing ? "Analyzing..." : "Analyze with AI"}
+                      {isAnalyzing ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing...</>
+                      ) : "Generate AI Insights"}
                     </Button>
                   </div>
                 )}

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -7,26 +8,35 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Search, UserMinus, UserCheck, ShieldAlert, Users, Clock, BrainCircuit, Loader2, CalendarCheck } from 'lucide-react';
-import { MOCK_LOGS, MOCK_USERS } from '@/lib/data';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Search, Clock, BrainCircuit, Loader2, CalendarCheck, Filter, User, ShieldAlert } from 'lucide-react';
+import { REASONS, COLLEGES, VisitorLog } from '@/lib/data';
 import { subDays, subWeeks, subMonths, isAfter, isToday } from 'date-fns';
 import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from 'recharts';
 import { adminLibraryInsights, AdminLibraryInsightsOutput } from '@/ai/flows/admin-library-insights';
 import { useToast } from '@/hooks/use-toast';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { useFirestore, useCollection } from '@/firebase';
 
 export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [users, setUsers] = useState(MOCK_USERS);
-  const [logs] = useState(MOCK_LOGS);
   const [activeTab, setActiveTab] = useState('attendance');
   const [timeFilter, setTimeFilter] = useState('day');
+  const [reasonFilter, setReasonFilter] = useState('all');
+  const [collegeFilter, setCollegeFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiInsights, setAiInsights] = useState<AdminLibraryInsightsOutput | null>(null);
   const { toast } = useToast();
+  const firestore = useFirestore();
 
-  const todayLogs = useMemo(() => {
-    return logs.filter(log => isToday(new Date(log.timestamp)));
-  }, [logs]);
+  const visitorLogsQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'visitor_logs'), orderBy('timestamp', 'desc'));
+  }, [firestore]);
+
+  const { data: logs, loading } = useCollection<VisitorLog>(visitorLogsQuery);
 
   const filteredLogs = useMemo(() => {
     let baseDate = new Date();
@@ -34,51 +44,53 @@ export default function AdminDashboard() {
     else if (timeFilter === 'week') baseDate = subWeeks(new Date(), 1);
     else if (timeFilter === 'month') baseDate = subMonths(new Date(), 1);
 
-    return logs.filter(log => {
+    return (logs || []).filter(log => {
       const matchesSearch = log.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            log.email.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesTime = isAfter(new Date(log.timestamp), baseDate);
-      return matchesSearch && matchesTime;
-    });
-  }, [logs, searchQuery, timeFilter]);
+      
+      const logDate = new Date(log.timestamp);
+      const matchesTime = isAfter(logDate, baseDate);
+      
+      const matchesReason = reasonFilter === 'all' || log.reason === reasonFilter;
+      const matchesCollege = collegeFilter === 'all' || log.college === collegeFilter;
+      const matchesType = typeFilter === 'all' || 
+                         (typeFilter === 'employee' && log.isEmployee) || 
+                         (typeFilter === 'student' && !log.isEmployee);
 
-  const collegeStats = useMemo(() => {
-    const stats: Record<string, number> = {};
-    filteredLogs.forEach(log => {
-      stats[log.college] = (stats[log.college] || 0) + 1;
+      return matchesSearch && matchesTime && matchesReason && matchesCollege && matchesType;
     });
-    return Object.entries(stats).map(([name, count]) => ({ name, count }));
-  }, [filteredLogs]);
+  }, [logs, searchQuery, timeFilter, reasonFilter, collegeFilter, typeFilter]);
 
-  const peakHourDisplay = useMemo(() => {
-    if (filteredLogs.length === 0) return "N/A";
+  const stats = useMemo(() => {
+    const today = (logs || []).filter(l => isToday(new Date(l.timestamp))).length;
+    const employees = filteredLogs.filter(l => l.isEmployee).length;
+    const students = filteredLogs.filter(l => !l.isEmployee).length;
+    
     const hours: Record<number, number> = {};
     filteredLogs.forEach(log => {
       const h = new Date(log.timestamp).getHours();
       hours[h] = (hours[h] || 0) + 1;
     });
     const entries = Object.entries(hours);
-    if (entries.length === 0) return "N/A";
-    const topHour = parseInt(entries.sort((a, b) => b[1] - a[1])[0][0]);
-    const ampm = topHour >= 12 ? 'PM' : 'AM';
-    const displayHour = topHour % 12 || 12;
-    const endHour = (topHour + 1) % 12 || 12;
-    const endAmpm = (topHour + 1) >= 12 ? 'PM' : 'AM';
-    return `${displayHour} ${ampm} - ${endHour} ${endAmpm}`;
+    let peakStr = "N/A";
+    if (entries.length > 0) {
+      const topHour = parseInt(entries.sort((a, b) => b[1] - a[1])[0][0]);
+      peakStr = `${topHour % 12 || 12} ${topHour >= 12 ? 'PM' : 'AM'}`;
+    }
+
+    return { today, employees, students, peakStr };
+  }, [logs, filteredLogs]);
+
+  const collegeChartData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    filteredLogs.forEach(log => {
+      counts[log.college] = (counts[log.college] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, count]) => ({ name, count }));
   }, [filteredLogs]);
 
-  const toggleBlockUser = (email: string) => {
-    setUsers(prev => prev.map(u => 
-      u.email === email ? { ...u, isBlocked: !u.isBlocked } : u
-    ));
-    const user = users.find(u => u.email === email);
-    toast({
-      title: user?.isBlocked ? "User Unblocked" : "User Blocked",
-      description: `${user?.name} has been ${user?.isBlocked ? 'granted' : 'denied'} access.`,
-    });
-  };
-
   const handleRunAI = async () => {
+    if (!logs || logs.length === 0) return;
     setIsAnalyzing(true);
     try {
       const result = await adminLibraryInsights({ visitorData: logs.slice(0, 50) });
@@ -94,12 +106,21 @@ export default function AdminDashboard() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <p className="text-muted-foreground font-medium">Loading analytics...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-headline font-bold text-slate-900 tracking-tight">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Monitor library activity and manage facility access.</p>
+          <p className="text-muted-foreground">Comprehensive library visitor analytics and management.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button 
@@ -109,161 +130,90 @@ export default function AdminDashboard() {
             disabled={isAnalyzing}
           >
             {isAnalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
-            AI Insights
+            AI Report
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Today's Check-ins" value={todayLogs.length} icon={<CalendarCheck className="w-5 h-5" />} description="New visitors today" />
-        <StatCard title="Peak Period" value={peakHourDisplay} icon={<Clock className="w-5 h-5" />} description="Busiest time slots" />
-        <StatCard title="Active Users" value={users.filter(u => !u.isBlocked).length} icon={<UserCheck className="w-5 h-5" />} description="Non-blocked users" />
-        <StatCard title="Blocked Users" value={users.filter(u => u.isBlocked).length} icon={<ShieldAlert className="w-5 h-5" />} description="Access denied" />
+        <StatCard title="Today's Total" value={stats.today} icon={<CalendarCheck className="w-5 h-5" />} description="New visitors today" />
+        <StatCard title="Peak Hour" value={stats.peakStr} icon={<Clock className="w-5 h-5" />} description="Busiest time" />
+        <StatCard title="Students" value={stats.students} icon={<User className="w-5 h-5" />} description="Filtered students" />
+        <StatCard title="Employees" value={stats.employees} icon={<ShieldAlert className="w-5 h-5" />} description="Faculty & Staff" />
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <div className="flex items-center justify-between border-b pb-1">
-          <TabsList className="bg-transparent h-auto p-0 space-x-6">
-            <TabsTrigger value="attendance" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">Daily Attendance</TabsTrigger>
-            <TabsTrigger value="overview" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">Statistics</TabsTrigger>
-            <TabsTrigger value="visitors" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">Activity Log</TabsTrigger>
-            <TabsTrigger value="users" className="bg-transparent border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none py-2 px-0 font-semibold text-base">User Management</TabsTrigger>
-          </TabsList>
-          
-          {activeTab === 'visitors' && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-muted-foreground">Period:</span>
-              <select 
-                className="text-sm border-none bg-transparent font-semibold focus:ring-0 cursor-pointer"
-                value={timeFilter}
-                onChange={(e) => setTimeFilter(e.target.value)}
-              >
-                <option value="day">Last 24 Hours</option>
-                <option value="week">Last 7 Days</option>
-                <option value="month">Last 30 Days</option>
-              </select>
-            </div>
-          )}
-        </div>
-
-        <TabsContent value="attendance" className="space-y-6">
-          <Card className="shadow-sm border-slate-200">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div>
-                <CardTitle className="text-lg">Daily Attendance</CardTitle>
-                <CardDescription>Students logged in today: {new Date().toLocaleDateString()}</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead>Student Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>College</TableHead>
-                    <TableHead>Reason</TableHead>
-                    <TableHead>Check-in Time</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {todayLogs.map((log) => (
-                    <TableRow key={log.id} className="group transition-colors">
-                      <TableCell className="font-semibold">{log.name}</TableCell>
-                      <TableCell className="text-slate-500">{log.email}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="font-normal text-slate-600 bg-slate-50">{log.college}</Badge>
-                      </TableCell>
-                      <TableCell>{log.reason}</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {todayLogs.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">No students have checked in yet today.</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 shadow-sm border-slate-200">
-              <CardHeader>
-                <CardTitle className="text-lg">Visitor Traffic by College</CardTitle>
-                <CardDescription>Visualizing distribution of visits across programs</CardDescription>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={collegeStats}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                      cursor={{ fill: '#f1f5f9' }}
-                    />
-                    <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm border-slate-200">
-              <CardHeader>
-                <CardTitle className="text-lg">AI-Powered Insights</CardTitle>
-                <CardDescription>Generative analysis of patterns</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {aiInsights ? (
-                  <div className="space-y-4 text-sm animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <div>
-                      <h4 className="font-bold text-primary mb-1">Peak Periods</h4>
-                      <p className="text-muted-foreground">{aiInsights.peakUsageTimes.join(', ')}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-primary mb-1">Top Reasons</h4>
-                      <p className="text-muted-foreground">{aiInsights.popularVisitReasons.slice(0, 3).join(', ')}</p>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-primary mb-1">Recommendation</h4>
-                      <p className="text-muted-foreground">{aiInsights.actionableRecommendations[0]}</p>
-                    </div>
-                    <Button variant="link" size="sm" className="px-0 text-primary" onClick={() => setAiInsights(null)}>Reset Analysis</Button>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-[240px] text-center border-2 border-dashed rounded-lg p-6 bg-slate-50/50">
-                    <BrainCircuit className="w-10 h-10 text-slate-300 mb-4" />
-                    <p className="text-slate-500 mb-4 text-sm">Run AI analysis to discover hidden usage trends and resource optimization tips.</p>
-                    <Button 
-                      onClick={handleRunAI} 
-                      disabled={isAnalyzing}
-                      className="bg-accent hover:bg-accent/90"
-                    >
-                      {isAnalyzing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Run AI Analysis"}
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+      <Card className="border-slate-200 shadow-sm overflow-hidden">
+        <CardHeader className="bg-slate-50/50 border-b">
+          <div className="flex items-center gap-2 text-primary">
+            <Filter className="w-4 h-4" />
+            <CardTitle className="text-sm font-bold uppercase tracking-wider">Analytics Filters</CardTitle>
           </div>
-        </TabsContent>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-slate-500 uppercase">Range</Label>
+              <Select value={timeFilter} onValueChange={setTimeFilter}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="day">Day</SelectItem>
+                  <SelectItem value="week">Week</SelectItem>
+                  <SelectItem value="month">Month</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-slate-500 uppercase">College</Label>
+              <Select value={collegeFilter} onValueChange={setCollegeFilter}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {COLLEGES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-slate-500 uppercase">Reason</Label>
+              <Select value={reasonFilter} onValueChange={setReasonFilter}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  {REASONS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-slate-500 uppercase">Type</Label>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="employee">Employee</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="visitors">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="bg-white border p-1 h-auto space-x-1 shadow-sm">
+          <TabsTrigger value="attendance" className="data-[state=active]:bg-primary data-[state=active]:text-white">Attendance</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-white">Statistics</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="attendance">
           <Card className="shadow-sm border-slate-200">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-4">
               <div>
-                <CardTitle className="text-lg">Historical Activity Log</CardTitle>
-                <CardDescription>Complete history of library entries</CardDescription>
+                <CardTitle className="text-lg">Visitor Log</CardTitle>
+                <CardDescription>{filteredLogs.length} matching records</CardDescription>
               </div>
-              <div className="relative w-72">
+              <div className="relative w-64">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="Search by name or email..." 
+                  placeholder="Search..." 
                   className="pl-10" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -273,32 +223,40 @@ export default function AdminDashboard() {
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow className="hover:bg-transparent">
+                  <TableRow className="bg-slate-50/50">
                     <TableHead>Visitor</TableHead>
-                    <TableHead>College</TableHead>
+                    <TableHead>Affiliation</TableHead>
                     <TableHead>Reason</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead>Timestamp</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredLogs.map((log) => (
-                    <TableRow key={log.id} className="group transition-colors">
+                    <TableRow key={log.id}>
                       <TableCell>
                         <div className="font-semibold">{log.name}</div>
                         <div className="text-xs text-muted-foreground">{log.email}</div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="font-normal text-slate-600 bg-slate-50">{log.college}</Badge>
+                        <Badge variant="outline" className="font-normal">{log.college}</Badge>
                       </TableCell>
                       <TableCell>{log.reason}</TableCell>
+                      <TableCell>
+                        {log.isEmployee ? (
+                          <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200">Staff</Badge>
+                        ) : (
+                          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200">Student</Badge>
+                        )}
+                      </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
-                        {new Date(log.timestamp).toLocaleString()}
+                        {new Date(log.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                       </TableCell>
                     </TableRow>
                   ))}
                   {filteredLogs.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">No records found matching your search.</TableCell>
+                      <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">No records found.</TableCell>
                     </TableRow>
                   )}
                 </TableBody>
@@ -307,61 +265,50 @@ export default function AdminDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="users">
-          <Card className="shadow-sm border-slate-200">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div>
-                <CardTitle className="text-lg">System Users</CardTitle>
-                <CardDescription>Manage user accounts and access rights</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead>Full Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.email}>
-                      <TableCell className="font-semibold">{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        <span className={`text-xs font-bold uppercase tracking-wider ${user.role === 'admin' ? 'text-primary' : 'text-slate-500'}`}>
-                          {user.role}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {user.isBlocked ? (
-                          <Badge variant="destructive" className="gap-1"><ShieldAlert className="w-3 h-3" /> Blocked</Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Active</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {user.role !== 'admin' && (
-                          <Button 
-                            variant={user.isBlocked ? "outline" : "destructive"} 
-                            size="sm"
-                            onClick={() => toggleBlockUser(user.email)}
-                            className="h-8 gap-1.5"
-                          >
-                            {user.isBlocked ? <UserCheck className="w-4 h-4" /> : <UserMinus className="w-4 h-4" />}
-                            {user.isBlocked ? "Unblock" : "Block"}
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+        <TabsContent value="overview">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-2 shadow-sm border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-lg">College Distribution</CardTitle>
+              </CardHeader>
+              <CardContent className="h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={collegeChartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="name" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip cursor={{ fill: '#f8fafc' }} />
+                    <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm border-slate-200">
+              <CardHeader>
+                <CardTitle className="text-lg">AI Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {aiInsights ? (
+                  <div className="space-y-4 text-sm">
+                    <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
+                      <p className="font-semibold text-primary mb-1">Summary</p>
+                      <p className="text-slate-600">{aiInsights.overallSummary}</p>
+                    </div>
+                    <Button variant="outline" className="w-full" onClick={() => setAiInsights(null)}>Clear</Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-[280px] text-center p-6 border-2 border-dashed rounded-xl bg-slate-50">
+                    <BrainCircuit className="w-12 h-12 text-slate-300 mb-4" />
+                    <p className="text-slate-500 mb-6 text-sm">Generate AI patterns from latest data.</p>
+                    <Button onClick={handleRunAI} disabled={isAnalyzing}>
+                      {isAnalyzing ? "Analyzing..." : "Analyze with AI"}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
@@ -370,13 +317,11 @@ export default function AdminDashboard() {
 
 function StatCard({ title, value, icon, description }: { title: string; value: string | number; icon: React.ReactNode; description: string }) {
   return (
-    <Card className="shadow-sm border-slate-200 hover:border-primary/50 transition-colors">
+    <Card className="shadow-sm border-slate-200 hover:border-primary/30 transition-all">
       <CardContent className="pt-6">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <div className="p-2 bg-slate-100 rounded-lg text-slate-600">
-            {icon}
-          </div>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">{title}</p>
+          <div className="p-2 bg-primary/5 rounded-lg text-primary">{icon}</div>
         </div>
         <div className="space-y-1">
           <h3 className="text-2xl font-headline font-bold text-slate-900">{value}</h3>

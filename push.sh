@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # Script to manually push updates to GitHub with uniform messaging

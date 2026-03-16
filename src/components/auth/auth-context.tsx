@@ -1,73 +1,93 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserAccount, MOCK_USERS } from '@/lib/data';
+import { UserAccount, isPrimaryAdmin } from '@/lib/data';
+import { 
+  getAuth, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signOut, 
+  onAuthStateChanged,
+  User
+} from 'firebase/auth';
+import { initializeFirebase } from '@/firebase';
 
 interface AuthContextType {
   user: UserAccount | null;
-  login: (email: string) => Promise<{ success: boolean; message: string }>;
+  firebaseUser: User | null;
+  loginWithGoogle: () => Promise<void>;
   logout: () => void;
   isLoading: boolean;
+  activeRole: 'admin' | 'user';
+  toggleRole: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserAccount | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeRole, setActiveRole] = useState<'admin' | 'user'>('user');
 
   useEffect(() => {
-    // Simulate checking session or loading initial state
-    const timer = setTimeout(() => {
+    const { auth } = initializeFirebase();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setFirebaseUser(user);
+      if (user) {
+        const isAdm = isPrimaryAdmin(user.email);
+        const account: UserAccount = {
+          email: user.email || '',
+          name: user.displayName || 'User',
+          role: isAdm ? 'admin' : 'user',
+          isBlocked: false,
+          college: 'General Education'
+        };
+        setUserAccount(account);
+        // Default primary admin to admin view, others to user view
+        setActiveRole(isAdm ? 'admin' : 'user');
+      } else {
+        setUserAccount(null);
+      }
       setIsLoading(false);
-    }, 100);
-    return () => clearTimeout(timer);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = async (email: string) => {
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const adminEmail = 'riccir.catimon@neu.edu.ph';
-
-    if (!normalizedEmail.endsWith('@neu.edu.ph')) {
-      setIsLoading(false);
-      return { 
-        success: false, 
-        message: "Access denied. Please use your official @neu.edu.ph institutional email." 
-      };
-    }
-
-    const foundUser = MOCK_USERS.find(u => u.email.toLowerCase() === normalizedEmail);
-    
-    if (foundUser?.isBlocked) {
-      setIsLoading(false);
-      return { success: false, message: "Your account has been blocked. Please contact the library administration." };
-    }
-
-    if (foundUser) {
-      setUser(foundUser);
-      setIsLoading(false);
-      return { success: true, message: `Welcome back, ${foundUser.name}!` };
-    } else {
-      const newUser: UserAccount = {
-        email: normalizedEmail,
-        name: normalizedEmail.split('@')[0].split('.').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' '),
-        role: normalizedEmail === adminEmail ? 'admin' : 'user',
-        isBlocked: false,
-        college: 'General Education'
-      };
-      setUser(newUser);
-      setIsLoading(false);
-      return { success: true, message: `Welcome to LibFlow, ${newUser.name}!` };
+  const loginWithGoogle = async () => {
+    const { auth } = initializeFirebase();
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Error signing in with Google", error);
+      throw error;
     }
   };
 
-  const logout = () => setUser(null);
+  const logout = async () => {
+    const { auth } = initializeFirebase();
+    await signOut(auth);
+  };
+
+  const toggleRole = () => {
+    if (isPrimaryAdmin(firebaseUser?.email)) {
+      setActiveRole(prev => prev === 'admin' ? 'user' : 'admin');
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      user: userAccount, 
+      firebaseUser,
+      loginWithGoogle, 
+      logout, 
+      isLoading,
+      activeRole,
+      toggleRole
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -75,14 +95,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  // During build/prerender, context might be undefined. 
-  // We return a safe default instead of throwing to prevent build failures.
   if (!context) {
     return {
       user: null,
-      login: async () => ({ success: false, message: "Auth context not available during build" }),
+      firebaseUser: null,
+      loginWithGoogle: async () => {},
       logout: () => {},
-      isLoading: false
+      isLoading: false,
+      activeRole: 'user' as const,
+      toggleRole: () => {}
     };
   }
   return context;

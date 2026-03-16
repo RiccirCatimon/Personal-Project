@@ -8,22 +8,24 @@
 
 ## 📅 Version History
 
-### v1.1.7 - Credentials Verified & Domain Whitelisting Needed
+### v1.1.8 - Domain Authorization Fix
 - **Date:** 2025-02-21
-- **Status:** Resolving `auth/unauthorized-domain` error.
-- **Fixed:**
-  1. Updated `apiKey` and `appId` to match the official Firebase Console snippet precisely.
-  2. Verified `projectId` and `authDomain`.
+- **Status:** Fixing `auth/unauthorized-domain` error.
+- **Critical Correction:**
+  1. The Vercel *Project* URL (dashboard) is NOT the authorized domain.
+  2. You must use the **Public Deployment URL** (e.g., `lib-flow-neu.vercel.app`).
+  3. Verified `apiKey` and `appId` are now exactly matching the Firebase Console.
 
 ---
 
 ## 🚀 CRITICAL NEXT STEP: Domain Whitelisting
-To fix the `auth/unauthorized-domain` error:
-1. Copy your deployment URL (e.g., `https://lib-flow-neu.vercel.app`).
-2. Go to [Firebase Console > Authentication > Settings > Authorized domains](https://console.firebase.google.com/project/studio-2392449049-de650/authentication/settings).
-3. Click **Add domain**.
-4. Paste your URL (without the `https://` part, just the domain).
-5. Wait 1-2 minutes for the change to propagate.
+To fix the login error:
+1. Go to your **Vercel Project Dashboard**.
+2. Look for the **"Domain"** or **"Deployment URL"** (e.g., `personal-roject.vercel.app`).
+3. Go to [Firebase Console > Authentication > Settings > Authorized domains](https://console.firebase.google.com/project/studio-2392449049-de650/authentication/settings).
+4. Click **Add domain**.
+5. Paste your URL (without `https://`, just the text like `personal-roject.vercel.app`).
+6. Click **Add**.
 
 ---
 *Last Updated: 2025-02-21*

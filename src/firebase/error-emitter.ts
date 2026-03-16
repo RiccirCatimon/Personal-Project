@@ -1,5 +1,28 @@
 'use client';
 
-import { EventEmitter } from 'events';
+/**
+ * A lightweight, browser-compatible event emitter to avoid 
+ * Node.js 'events' module dependencies in the client.
+ */
+type Listener = (data: any) => void;
 
-export const errorEmitter = new EventEmitter();
+class SimpleEmitter {
+  private listeners: { [event: string]: Listener[] } = {};
+
+  on(event: string, listener: Listener) {
+    if (!this.listeners[event]) this.listeners[event] = [];
+    this.listeners[event].push(listener);
+  }
+
+  off(event: string, listener: Listener) {
+    if (!this.listeners[event]) return;
+    this.listeners[event] = this.listeners[event].filter(l => l !== listener);
+  }
+
+  emit(event: string, data: any) {
+    if (!this.listeners[event]) return;
+    this.listeners[event].forEach(l => l(data));
+  }
+}
+
+export const errorEmitter = new SimpleEmitter();

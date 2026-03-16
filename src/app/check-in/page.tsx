@@ -31,6 +31,12 @@ export default function CheckInPage() {
 
   const handleCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!firestore) {
+      toast({ variant: "destructive", title: "Connection Error", description: "Database is not ready. Please refresh." });
+      return;
+    }
+
     if (!reason || !college) {
       toast({ 
         variant: "destructive", 
@@ -41,6 +47,8 @@ export default function CheckInPage() {
     }
 
     setIsSubmitting(true);
+    console.log("Starting check-in submission...");
+
     const data = {
       email: firebaseUser?.email || user?.email || 'anonymous',
       name: firebaseUser?.displayName || user?.name || 'Anonymous User',
@@ -57,23 +65,23 @@ export default function CheckInPage() {
         serverTimestamp: serverTimestamp(),
       });
       
+      console.log("Check-in saved successfully.");
       setHasCheckedIn(true);
       toast({ 
         title: "Check-in Successful", 
-        description: "Your visit has been recorded." 
+        description: "Welcome to the NEU Library!" 
       });
     } catch (error: any) {
       console.error("Check-in submission failed:", error);
       
-      // Provide user-friendly feedback based on the error
       const isPermissionError = error.code === 'permission-denied' || error.message?.includes('permission');
       
       toast({ 
         variant: "destructive", 
         title: "Check-in Failed", 
         description: isPermissionError 
-          ? "You don't have permission to log visits. Please contact the administrator." 
-          : "An error occurred while saving your visit. Please try again." 
+          ? "Permission Denied: Your account is restricted from logging entries." 
+          : "An error occurred while saving your visit. Please check your connection." 
       });
 
       if (isPermissionError) {
@@ -85,6 +93,7 @@ export default function CheckInPage() {
         errorEmitter.emit('permission-error', err);
       }
     } finally {
+      // Ensure the button always resets even if an error occurs
       setIsSubmitting(false);
     }
   };
@@ -94,7 +103,7 @@ export default function CheckInPage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
       {hasCheckedIn ? (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-10 animate-in fade-in zoom-in duration-1000">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-10 animate-in fade-in zoom-in duration-700">
           <div className="relative">
             <div className="absolute -inset-4 bg-primary/10 rounded-full blur-xl animate-pulse"></div>
             <div className="relative bg-white p-8 rounded-full shadow-2xl border-4 border-primary/20">
@@ -120,7 +129,7 @@ export default function CheckInPage() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="flex-1 h-14 text-lg border-2" 
+              className="flex-1 h-14 text-lg border-2 font-bold" 
               onClick={() => {
                 setHasCheckedIn(false);
                 setReason('');
@@ -131,7 +140,7 @@ export default function CheckInPage() {
             <Button 
               size="lg" 
               variant="ghost" 
-              className="flex-1 h-14 text-lg text-destructive hover:bg-destructive/5" 
+              className="flex-1 h-14 text-lg text-destructive hover:bg-destructive/5 font-bold" 
               onClick={logout}
             >
               <LogOut className="w-5 h-5 mr-2" /> Sign Out

@@ -1,9 +1,8 @@
-
 # PLEASE READ ME
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** jcesperanza@neu.edu.ph
-**Status:** Feature Complete / Production Ready
+**Status:** Configuration Phase
 
 ---
 

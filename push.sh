@@ -1,8 +1,10 @@
-
 #!/bin/bash
 
 # Script to manually push updates to GitHub with uniform messaging
 echo "🚀 Starting professional synchronization..."
+
+# Ensure permissions (self-healing)
+chmod +x "$0"
 
 # Add all changes
 git add .

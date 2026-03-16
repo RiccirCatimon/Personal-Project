@@ -1,7 +1,13 @@
 'use client';
 
+/**
+ * LibFlow Firebase Configuration
+ * 
+ * IMPORTANT: Replace the apiKey placeholder below with your actual Web API Key
+ * from the Firebase Console (Project Settings > General).
+ */
 export const firebaseConfig = {
-  apiKey: "AIzaSyAs-placeholder-key",
+  apiKey: "AIzaSyAs-placeholder-key", // Replace this with your actual Web API Key
   authDomain: "lib-flow-neu.firebaseapp.com",
   projectId: "lib-flow-neu",
   storageBucket: "lib-flow-neu.firebasestorage.app",

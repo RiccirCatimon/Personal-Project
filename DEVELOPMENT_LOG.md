@@ -2,25 +2,26 @@
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Status:** ✅ Authentication Setup Complete
+**Status:** ⚠️ Troubleshooting API Key Errors
 
 ---
 
 ## 📅 Version History
 
-### v1.1.3 - Production Configuration Applied
+### v1.1.4 - Manual Config Verification
 - **Date:** 2025-02-21
-- **Status:** Google Auth enabled and production config applied.
-- **Changes:**
-  1. Verified Google Provider status as "Enabled" in Firebase Console.
-  2. Updated `src/firebase/config.ts` with the official Web API Key.
-  3. Resolved "invalid-api-key" error during Google Sign-in.
+- **Status:** Resolving persistent "invalid-api-key" error.
+- **Current State:**
+  1. Google Auth is ENABLED in the Firebase Console.
+  2. `src/firebase/config.ts` has been cleaned of duplicates.
+  3. The project ID is confirmed as `studio-2392449049-de650`.
 
 ---
 
-## 🚀 Final Step
-1. **Sync to GitHub:** Run `./push.sh` to deploy the working configuration.
-2. **Verify Login:** Visit the live site and log in with your @neu.edu.ph account.
+## 🚀 Troubleshooting Steps
+1. **Double-Check API Key:** Go to Firebase Console -> Project Settings -> Web API Key.
+2. **Sync:** Run `./push.sh` after updating the key in the code.
+3. **Hard Refresh:** Clear your browser cache or try an Incognito window to ensure old keys aren't being used.
 
 ---
 *Last Updated: 2025-02-21*

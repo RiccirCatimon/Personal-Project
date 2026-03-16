@@ -2,22 +2,22 @@
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Status:** ✅ Deployment Sync (v1.2.3)
+**Status:** ✅ Deployment Sync (v1.2.4)
 
 ---
 
 ## 📅 Version History
 
-### v1.2.3 - Final Sync Verification
+### v1.2.4 - Final Domain Verification
+- **Date:** 2025-02-21
+- **Status:** Resolving auth/unauthorized-domain.
+- **Completed:** 
+  1. Confirmed domain `personal-roject.vercel.app` is the target.
+  2. Final sync of verified Firebase credentials.
+
+### v1.2.3 - Deployment Sync
 - **Date:** 2025-02-21
 - **Status:** Forcing GitHub main push.
-- **Completed:** 
-  1. Incremented version to v1.2.3 to verify Vercel build.
-  2. Optimized `push.sh` to explicitly target `origin main`.
-
-### v1.2.2 - Deployment Verification
-- **Date:** 2025-02-21
-- **Status:** Verifying Vercel sync.
 - **Completed:** 
   1. Updated version numbering to confirm deployment.
   2. Verified repository connection settings.

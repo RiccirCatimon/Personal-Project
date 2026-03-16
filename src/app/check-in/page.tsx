@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { REASONS, COLLEGES } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle2, Loader2, Sparkles, LogOut } from 'lucide-react';
+import { CheckCircle2, Loader2, Sparkles, LogOut, ArrowRight, Library } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -50,82 +50,107 @@ export default function CheckInPage() {
       timestamp: new Date().toISOString(),
     };
 
-    addDoc(collection(firestore, 'visitor_logs'), {
-      ...data,
-      serverTimestamp: serverTimestamp(),
-    })
-      .then(() => {
-        setHasCheckedIn(true);
-        toast({ title: "Success", description: "Entry recorded successfully." });
-      })
-      .catch(async () => {
-        const err = new FirestorePermissionError({ 
-          path: 'visitor_logs', 
-          operation: 'create', 
-          requestResourceData: data 
-        });
-        errorEmitter.emit('permission-error', err);
-      })
-      .finally(() => setIsSubmitting(false));
+    try {
+      await addDoc(collection(firestore, 'visitor_logs'), {
+        ...data,
+        serverTimestamp: serverTimestamp(),
+      });
+      setHasCheckedIn(true);
+      toast({ title: "Check-in Successful", description: "Your visit has been recorded." });
+    } catch (error) {
+      const err = new FirestorePermissionError({ 
+        path: 'visitor_logs', 
+        operation: 'create', 
+        requestResourceData: data 
+      });
+      errorEmitter.emit('permission-error', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary w-8 h-8" /></div>;
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
+    <div className="max-w-4xl mx-auto py-12 px-4">
       {hasCheckedIn ? (
-        <div className="text-center space-y-8 py-12 animate-in fade-in zoom-in duration-700">
-          <div className="mx-auto w-32 h-32 bg-green-50 rounded-full flex items-center justify-center text-green-600 border-4 border-white shadow-xl">
-            <CheckCircle2 className="w-16 h-16" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-10 animate-in fade-in zoom-in duration-1000">
+          <div className="relative">
+            <div className="absolute -inset-4 bg-primary/10 rounded-full blur-xl animate-pulse"></div>
+            <div className="relative bg-white p-8 rounded-full shadow-2xl border-4 border-primary/20">
+              <CheckCircle2 className="w-24 h-24 text-primary" />
+            </div>
           </div>
-          <div className="space-y-4">
-            <h1 className="text-5xl font-headline font-bold text-slate-900 tracking-tight">
+          
+          <div className="text-center space-y-6 max-w-2xl">
+            <h1 className="text-6xl font-headline font-black text-slate-900 tracking-tighter">
               Welcome to <span className="text-primary">NEU Library!</span>
             </h1>
-            <p className="text-xl text-muted-foreground max-w-md mx-auto">
-              Hello, {firebaseUser?.displayName}! Your entry has been securely recorded. Have a productive stay!
-            </p>
+            <div className="space-y-2">
+              <p className="text-2xl text-slate-600 font-medium">
+                Hello, <span className="font-bold text-slate-900">{firebaseUser?.displayName}</span>
+              </p>
+              <p className="text-lg text-muted-foreground italic">
+                "Your gateway to knowledge and spiritual growth."
+              </p>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button variant="outline" size="lg" onClick={() => setHasCheckedIn(false)}>
-              Log another entry
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md pt-6">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="flex-1 h-14 text-lg border-2" 
+              onClick={() => setHasCheckedIn(false)}
+            >
+              New Entry
             </Button>
-            <Button variant="ghost" size="lg" onClick={logout} className="text-destructive hover:bg-destructive/10">
-              <LogOut className="w-4 h-4 mr-2" /> Sign Out
+            <Button 
+              size="lg" 
+              variant="ghost" 
+              className="flex-1 h-14 text-lg text-destructive hover:bg-destructive/5" 
+              onClick={logout}
+            >
+              <LogOut className="w-5 h-5 mr-2" /> Sign Out
             </Button>
+          </div>
+          
+          <div className="flex items-center gap-3 text-slate-400 font-bold uppercase tracking-widest text-[10px] pt-12">
+            <Library className="w-4 h-4" />
+            <span>Official Library Log System</span>
           </div>
         </div>
       ) : (
         <>
           <div className="mb-10 space-y-3">
-            <h1 className="text-4xl font-headline font-bold text-slate-900 tracking-tight">Library Check-in</h1>
-            <p className="text-lg text-muted-foreground">
-              Hello, <span className="text-primary font-bold">{firebaseUser?.displayName}</span>! Please complete the form below.
+            <h1 className="text-5xl font-headline font-bold text-slate-900 tracking-tight">Library Check-in</h1>
+            <p className="text-xl text-muted-foreground">
+              Welcome back, <span className="text-primary font-bold">{firebaseUser?.displayName}</span>.
             </p>
           </div>
 
-          <Card className="border-none shadow-2xl overflow-hidden ring-1 ring-slate-200">
-            <CardHeader className="bg-primary/5 border-b py-6">
-              <div className="flex items-center gap-2 text-primary font-bold text-lg">
-                <Sparkles className="w-6 h-6" /> Visitor Details
+          <Card className="border-none shadow-[0_20px_50px_rgba(34,62,170,0.1)] overflow-hidden ring-1 ring-slate-200">
+            <CardHeader className="bg-primary/5 border-b py-8">
+              <div className="flex items-center gap-3 text-primary font-black text-xl">
+                <Sparkles className="w-7 h-7" /> Visitor Entry Form
               </div>
             </CardHeader>
-            <CardContent className="pt-8 px-8">
-              <form onSubmit={handleCheckIn} className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <CardContent className="pt-10 px-10">
+              <form onSubmit={handleCheckIn} className="space-y-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                   <div className="space-y-3">
-                    <Label className="font-bold text-slate-700">Your College</Label>
+                    <Label className="font-bold text-slate-700 text-base">Affiliated College</Label>
                     <Select value={college} onValueChange={setCollege}>
-                      <SelectTrigger className="h-12"><SelectValue placeholder="Select college" /></SelectTrigger>
+                      <SelectTrigger className="h-14 text-lg border-2 focus:ring-primary/20"><SelectValue placeholder="Select college" /></SelectTrigger>
                       <SelectContent>
                         {COLLEGES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-3">
-                    <Label className="font-bold text-slate-700">Reason for Visit</Label>
+                    <Label className="font-bold text-slate-700 text-base">Purpose of Visit</Label>
                     <Select value={reason} onValueChange={setReason}>
-                      <SelectTrigger className="h-12"><SelectValue placeholder="Reason for visit" /></SelectTrigger>
+                      <SelectTrigger className="h-14 text-lg border-2 focus:ring-primary/20"><SelectValue placeholder="Reason for visit" /></SelectTrigger>
                       <SelectContent>
                         {REASONS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
                       </SelectContent>
@@ -133,29 +158,37 @@ export default function CheckInPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3 p-5 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200 transition-colors hover:bg-slate-100">
+                <div className="flex items-center space-x-4 p-6 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 transition-all hover:bg-slate-100 hover:border-primary/30">
                   <Checkbox 
                     id="employee" 
-                    className="w-5 h-5"
+                    className="w-6 h-6 rounded-md border-2 border-slate-300 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     checked={isEmployee} 
                     onCheckedChange={c => setIsEmployee(!!c)} 
                   />
-                  <label htmlFor="employee" className="text-sm font-bold text-slate-600 cursor-pointer select-none">
-                    I am an employee (Faculty, Teacher, or Staff)
+                  <label htmlFor="employee" className="text-base font-bold text-slate-600 cursor-pointer select-none">
+                    I am an NEU Employee (Faculty / Staff)
                   </label>
                 </div>
 
-                <Button type="submit" className="w-full h-14 text-lg font-bold shadow-lg shadow-primary/20" disabled={isSubmitting}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-16 text-xl font-black shadow-2xl shadow-primary/20 transition-all active:scale-[0.98]" 
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" /> Recording...
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-6 h-6 animate-spin" /> Verifying...
                     </div>
-                  ) : "Complete Check-in"}
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      Complete Check-in <ArrowRight className="w-6 h-6" />
+                    </div>
+                  )}
                 </Button>
               </form>
             </CardContent>
-            <CardFooter className="bg-slate-50/50 py-5 border-t text-xs text-center text-muted-foreground font-medium">
-              By checking in, you agree to comply with all New Era University Library policies.
+            <CardFooter className="bg-slate-50/80 py-6 border-t text-xs text-center justify-center text-muted-foreground font-bold uppercase tracking-widest">
+              Securely Authenticated via @neu.edu.ph
             </CardFooter>
           </Card>
         </>

@@ -3,11 +3,19 @@
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Status:** ✅ Deployment Sync (v1.2.7)
+**Status:** ✅ Deployment Sync (v1.2.8)
 
 ---
 
 ## 📅 Version History
+
+### v1.2.8 - Enhanced User Experience & Welcome Sign
+- **Date:** 2025-02-21
+- **Status:** Improved post-check-in UI with a dedicated "Welcome Sign".
+- **Completed:** 
+  1. Replaced the "loading button" loop with a high-visibility Success state.
+  2. Enhanced typography and layout for the Welcome message.
+  3. Added "New Entry" reset functionality for multi-user device kiosks.
 
 ### v1.2.7 - Advanced Analytics & Range Filtering
 - **Date:** 2025-02-21

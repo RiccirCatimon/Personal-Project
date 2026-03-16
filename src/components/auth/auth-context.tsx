@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -81,7 +80,7 @@ export function useAuth() {
   if (!context) {
     return {
       user: null,
-      login: async () => ({ success: false, message: "Context not found" }),
+      login: async () => ({ success: false, message: "Auth context not available during build" }),
       logout: () => {},
       isLoading: false
     };

@@ -1,10 +1,8 @@
-
-# 🚨 PLEASE READ ME 🚨
+# PLEASE READ ME
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Access Policy:** Only institutional emails (@neu.edu.ph) are permitted.
-**Security:** Admin features are strictly locked to the Primary Admin email.
+**Status:** Stable / Deployment Ready
 
 ---
 

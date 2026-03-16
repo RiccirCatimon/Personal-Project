@@ -1,4 +1,3 @@
-
 # LibFlow | NEU Library Visitor Management System
 
 LibFlow is a specialized visitor management and analytics platform designed for the New Era University Library. It bridges the gap between manual logbooks and smart facility management using AI.
@@ -11,13 +10,13 @@ LibFlow is a specialized visitor management and analytics platform designed for 
 
 ## 📂 Project Structure
 
-- `src/app/`: Core application routes, including the main dashboard and check-in pages.
-- `src/components/`: Reusable UI components, layout elements, and authentication logic.
-- `src/ai/`: Generative AI logic, including Genkit flows for library data analysis.
-- `src/lib/`: Core utilities, mock data, and TypeScript type definitions.
-- `src/hooks/`: Custom React hooks for managing state and UI interactions.
-- `DEVELOPMENT_LOG.md`: Technical version history, security policies, and critical "PLEASE READ ME" info.
-- `push.sh`: Specialized script for automated and secure synchronization with GitHub.
+- `src/app/`: Contains the main application routes, pages, and global styling.
+- `src/components/`: Reusable UI components, authentication views, and layout elements.
+- `src/ai/`: Generative AI logic, prompt definitions, and Genkit flows for data analysis.
+- `src/lib/`: Shared utility functions, mock data, and TypeScript type definitions.
+- `src/hooks/`: Custom React hooks for managing state and UI-specific interactions.
+- `DEVELOPMENT_LOG.md`: Central record of version history, bug fixes, and critical "PLEASE READ ME" notices.
+- `push.sh`: Automated bash script for synchronized and professional GitHub updates.
 
 ## 📖 How it Works
 

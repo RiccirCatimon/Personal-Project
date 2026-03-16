@@ -3,11 +3,11 @@
 /**
  * LibFlow Firebase Configuration
  * 
- * NOTE: Ensure you have enabled Google Authentication in the Firebase Console.
- * Replace 'YOUR_API_KEY' with the Web API Key found in Project Settings.
+ * IMPORTANT: If you see "auth/invalid-api-key", you must replace the apiKey below
+ * with the one found in your Firebase Console under Project Settings > General.
  */
 export const firebaseConfig = {
-  apiKey: "AIzaSyCMDEJEP1ggjdsfCBbeI_pXtv2Eg6t6TMU", // Verify this in Firebase Console > Project Settings
+  apiKey: "AIzaSyCMDEJEP1ggjdsfCBbeI_pXtv2Eg6t6TMU", // <-- REPLACE THIS WITH YOUR WEB API KEY
   authDomain: "studio-2392449049-de650.firebaseapp.com",
   projectId: "studio-2392449049-de650",
   storageBucket: "studio-2392449049-de650.firebasestorage.app",

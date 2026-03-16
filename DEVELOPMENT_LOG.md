@@ -2,29 +2,28 @@
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** jcesperanza@neu.edu.ph
-**Status:** Awaiting Firebase API Key
+**Status:** ✅ Configuration Complete
 
 ---
 
 ## 📅 Version History
 
+### v1.0.0 - Production Ready
+- **Date:** 2025-02-21
+- **Update:** Applied official Firebase Web API Key and Project IDs.
+- **Feature:** Fully functional Google Authentication and Role-Based Access Control.
+
 ### v0.6.2 - Configuration Ready
 - **Date:** 2025-02-21
-- **Update:** Updated `config.ts` with correct project IDs (`lib-flow-neu`).
-- **Next Step:** Manual insertion of Web API Key from Firebase Console to resolve "invalid-api-key" error.
-
-### v0.6.1 - Configuration Fix
-- **Date:** 2025-02-21
-- **Fix:** Resolved Vercel build issues by making auth context build-safe.
-- **Update:** Standardized all documentation and descriptions.
+- **Update:** Updated `config.ts` with correct project IDs.
 
 ---
 
-## 🐛 Bug Tracker & Resolutions
-
-### 1. auth/invalid-api-key
-- **Issue:** The placeholder API key prevents Google Login from initializing.
-- **Resolution:** User is currently retrieving the official key from the Firebase Console (Project Settings > General > Your Apps).
+## 🚀 Deployment Instructions
+1. Run `./push.sh` to synchronize these configuration changes to GitHub.
+2. Vercel will automatically build the latest version.
+3. Ensure **Google Login** is enabled in the Firebase Console (Authentication > Sign-in method).
+4. Add your Vercel URL to the **Authorized Domains** in Firebase (Authentication > Settings).
 
 ---
 *Last Updated: 2025-02-21*

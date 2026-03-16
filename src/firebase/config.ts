@@ -3,16 +3,13 @@
 /**
  * LibFlow Firebase Configuration
  * 
- * TO DO: 
- * 1. Go to Firebase Console > Project Settings > General.
- * 2. Scroll to "Your apps" and copy the 'apiKey'.
- * 3. Replace the placeholder below with your actual key.
+ * Synchronized with the official project settings for studio-2392449049-de650.
  */
 export const firebaseConfig = {
-  apiKey: "AIzaSyAs-placeholder-key", // <-- REPLACE THIS WITH YOUR WEB API KEY FROM CONSOLE
-  authDomain: "lib-flow-neu.firebaseapp.com",
-  projectId: "lib-flow-neu",
-  storageBucket: "lib-flow-neu.firebasestorage.app",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:abcdef1234567890",
+  apiKey: "AIzaSyCMDEJEP1ggjdsfCBbeI_pXtv2Eg6t6TMU",
+  authDomain: "studio-2392449049-de650.firebaseapp.com",
+  projectId: "studio-2392449049-de650",
+  storageBucket: "studio-2392449049-de650.firebasestorage.app",
+  messagingSenderId: "202493931304",
+  appId: "1:202493931304:web:213eaa6e5bfa33f0e76a1d",
 };

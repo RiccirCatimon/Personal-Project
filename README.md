@@ -1,4 +1,4 @@
-
++x 
 # LibFlow | NEU Library Visitor Management System
 
 LibFlow is a specialized visitor management and analytics platform designed for the New Era University Library. It bridges the gap between manual logbooks and smart facility management using AI and cloud synchronization.

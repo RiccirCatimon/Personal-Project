@@ -3,7 +3,7 @@
 LibFlow is a specialized visitor management and analytics platform designed for the New Era University Library. It bridges the gap between manual logbooks and smart facility management using AI and cloud synchronization.
 
 ## 🚀 Live Application
-**Deployment Link:** [https://personal-roject.vercel.app](https://personal-roject.vercel.app)
+**Deployment Link:** [https://library-proj-ten.vercel.app](https://library-proj-ten.vercel.app)
 
 ## 🛠 Tech Stack
 - **Framework:** Next.js 15 (App Router)

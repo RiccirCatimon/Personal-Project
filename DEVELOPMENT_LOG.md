@@ -8,12 +8,13 @@
 
 ## 📅 Version History
 
-### v1.2.5 - New Domain Migration
+### v1.2.5 - New Domain Migration & Admin Expansion
 - **Date:** 2025-02-21
-- **Status:** Migrated to new Vercel domain.
+- **Status:** Migrated to new Vercel domain and added secondary admin.
 - **Completed:** 
   1. Updated all system links to `library-proj-ten.vercel.app`.
-  2. Final sync of project documentation.
+  2. Hardcoded `jcesperanza@neu.edu.ph` as a Primary Administrator.
+  3. Final sync of project documentation.
 
 ### v1.2.4 - Final Domain Verification
 - **Date:** 2025-02-21

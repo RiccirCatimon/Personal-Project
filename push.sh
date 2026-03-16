@@ -16,7 +16,7 @@ git add .
 
 # Commit with a uniform, professional message
 echo "📝 Committing changes..."
-git commit -m "chore: migrate system to v1.2.5 for new domain library-proj-ten.vercel.app" || true
+git commit -m "chore: migrate system to v1.2.5 for new domain library-proj-ten.vercel.app and add admin" || true
 
 # Push to the main branch explicitly
 echo "📤 Pushing to GitHub (main branch)..."

@@ -42,8 +42,8 @@ export default function CheckInPage() {
 
     setIsSubmitting(true);
     const data = {
-      email: firebaseUser?.email || user?.email,
-      name: firebaseUser?.displayName || user?.name,
+      email: firebaseUser?.email || user?.email || 'anonymous',
+      name: firebaseUser?.displayName || user?.name || 'Anonymous User',
       reason,
       college,
       isEmployee,
@@ -51,19 +51,39 @@ export default function CheckInPage() {
     };
 
     try {
-      await addDoc(collection(firestore, 'visitor_logs'), {
+      const logsRef = collection(firestore, 'visitor_logs');
+      await addDoc(logsRef, {
         ...data,
         serverTimestamp: serverTimestamp(),
       });
+      
       setHasCheckedIn(true);
-      toast({ title: "Check-in Successful", description: "Your visit has been recorded." });
-    } catch (error) {
-      const err = new FirestorePermissionError({ 
-        path: 'visitor_logs', 
-        operation: 'create', 
-        requestResourceData: data 
+      toast({ 
+        title: "Check-in Successful", 
+        description: "Your visit has been recorded." 
       });
-      errorEmitter.emit('permission-error', err);
+    } catch (error: any) {
+      console.error("Check-in submission failed:", error);
+      
+      // Provide user-friendly feedback based on the error
+      const isPermissionError = error.code === 'permission-denied' || error.message?.includes('permission');
+      
+      toast({ 
+        variant: "destructive", 
+        title: "Check-in Failed", 
+        description: isPermissionError 
+          ? "You don't have permission to log visits. Please contact the administrator." 
+          : "An error occurred while saving your visit. Please try again." 
+      });
+
+      if (isPermissionError) {
+        const err = new FirestorePermissionError({ 
+          path: 'visitor_logs', 
+          operation: 'create', 
+          requestResourceData: data 
+        });
+        errorEmitter.emit('permission-error', err);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +108,7 @@ export default function CheckInPage() {
             </h1>
             <div className="space-y-2">
               <p className="text-2xl text-slate-600 font-medium">
-                Hello, <span className="font-bold text-slate-900">{firebaseUser?.displayName}</span>
+                Hello, <span className="font-bold text-slate-900">{firebaseUser?.displayName || user?.name}</span>
               </p>
               <p className="text-lg text-muted-foreground italic">
                 "Your gateway to knowledge and spiritual growth."
@@ -101,7 +121,10 @@ export default function CheckInPage() {
               size="lg" 
               variant="outline" 
               className="flex-1 h-14 text-lg border-2" 
-              onClick={() => setHasCheckedIn(false)}
+              onClick={() => {
+                setHasCheckedIn(false);
+                setReason('');
+              }}
             >
               New Entry
             </Button>
@@ -125,7 +148,7 @@ export default function CheckInPage() {
           <div className="mb-10 space-y-3">
             <h1 className="text-5xl font-headline font-bold text-slate-900 tracking-tight">Library Check-in</h1>
             <p className="text-xl text-muted-foreground">
-              Welcome back, <span className="text-primary font-bold">{firebaseUser?.displayName}</span>.
+              Welcome back, <span className="text-primary font-bold">{firebaseUser?.displayName || user?.name}</span>.
             </p>
           </div>
 

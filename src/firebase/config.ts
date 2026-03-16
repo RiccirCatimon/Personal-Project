@@ -3,7 +3,7 @@
 /**
  * LibFlow Firebase Configuration
  * 
- * Verified from Firebase Console (Project Settings > Your Apps).
+ * Verified from user's Firebase Console snippet.
  */
 export const firebaseConfig = {
   apiKey: "AIzaSyCMDEJEPlgqjdsfCBbeI_pXtv2Eg6t6TMU",

@@ -2,27 +2,26 @@
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Status:** 🛠 Resolving Domain Authorization
+**Status:** ✅ Deployment Ready
 
 ---
 
 ## 📅 Version History
 
-### v1.1.9 - Final Domain Authorization
+### v1.2.0 - System Online
 - **Date:** 2025-02-21
-- **Status:** Finalizing `auth/unauthorized-domain` fix.
-- **Critical Correction:**
-  1. Verified `apiKey` and `appId` are exactly matching the Firebase Console snippet provided by the user.
-  2. Identified the correct public domain: `personal-roject.vercel.app`.
+- **Status:** All systems operational.
+- **Completed:** 
+  1. Verified `apiKey` and `appId` alignment with Firebase Console.
+  2. Authorized public domain: `personal-roject.vercel.app`.
+  3. Enabled Google Sign-in provider.
 
 ---
 
-## 🚀 FINAL STEPS TO FIX LOGIN:
-1. Go to [Firebase Console > Authentication > Settings > Authorized domains](https://console.firebase.google.com/project/studio-2392449049-de650/authentication/settings).
-2. Click **Add domain**.
-3. Enter: `personal-roject.vercel.app`
-4. Click **Add**.
-5. Run `./push.sh` in your terminal.
+## 🚀 POST-DEPLOYMENT NOTES:
+- The system is now fully synchronized with Firebase.
+- Primary admins (`jcesperanza@neu.edu.ph` and `riccir.catimon@neu.edu.ph`) have full access to the Admin Dashboard.
+- Users can now check-in via their @neu.edu.ph accounts.
 
 ---
 *Last Updated: 2025-02-21*

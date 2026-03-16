@@ -1,11 +1,10 @@
-
 'use client';
 
 import React, { useState } from 'react';
 import { useAuth } from './auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { BookOpen, Loader2 } from 'lucide-react';
+import { BookOpen, Loader2, ShieldCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function LoginView() {
@@ -25,7 +24,7 @@ export function LoginView() {
       toast({
         variant: "destructive",
         title: "Authentication Error",
-        description: error.message || "Failed to sign in with Google.",
+        description: error.message || "Failed to sign in. Ensure you use an @neu.edu.ph email.",
       });
     } finally {
       setLoading(false);
@@ -50,10 +49,16 @@ export function LoginView() {
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl">Sign In</CardTitle>
           <CardDescription>
-            Access the NEU Library system securely using your Google account
+            Access is strictly limited to authorized NEU personnel and students.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-start gap-3 mb-2">
+            <ShieldCheck className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 font-medium">
+              Institutional Login Required: You MUST use your official <strong>@neu.edu.ph</strong> Google account to proceed.
+            </p>
+          </div>
           <Button 
             onClick={handleGoogleLogin}
             className="w-full h-12 font-semibold flex items-center justify-center gap-3" 
@@ -81,20 +86,20 @@ export function LoginView() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Continue with Google
+                Sign in with NEU Email
               </>
             )}
           </Button>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4 border-t bg-slate-50/50 p-6">
-          <p className="text-xs text-center text-muted-foreground">
-            Please use your @neu.edu.ph or official Google account for institutional access.
+          <p className="text-[10px] text-center text-muted-foreground uppercase tracking-wider font-bold">
+            New Era University Library Security Protocol
           </p>
         </CardFooter>
       </Card>
 
       <div className="mt-8 text-xs text-slate-400 font-medium">
-        © 2025 New Era University Library | Secured Access
+        © 2025 New Era University Library | Developed for NEU
       </div>
     </div>
   );

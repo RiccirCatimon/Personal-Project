@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -12,6 +11,7 @@ import {
   User
 } from 'firebase/auth';
 import { initializeFirebase } from '@/firebase';
+import { toast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: UserAccount | null;
@@ -33,9 +33,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const { auth } = initializeFirebase();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setFirebaseUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // Strict domain check for @neu.edu.ph
+        if (!user.email?.toLowerCase().endsWith('@neu.edu.ph')) {
+          await signOut(auth);
+          setFirebaseUser(null);
+          setUserAccount(null);
+          setIsLoading(false);
+          toast({
+            variant: "destructive",
+            title: "Access Denied",
+            description: "Only @neu.edu.ph accounts are allowed to access LibFlow.",
+          });
+          return;
+        }
+
         const isAdm = isPrimaryAdmin(user.email);
         const account: UserAccount = {
           email: user.email || '',
@@ -45,10 +58,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           college: 'General Education'
         };
         setUserAccount(account);
-        // Default primary admin to admin view, others to user view
         setActiveRole(isAdm ? 'admin' : 'user');
+        setFirebaseUser(user);
       } else {
         setUserAccount(null);
+        setFirebaseUser(null);
       }
       setIsLoading(false);
     });
@@ -59,8 +73,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithGoogle = async () => {
     const { auth } = initializeFirebase();
     const provider = new GoogleAuthProvider();
+    // Prompt for account selection to ensure user can choose their NEU account
+    provider.setCustomParameters({ prompt: 'select_account' });
+    
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      if (result.user && !result.user.email?.toLowerCase().endsWith('@neu.edu.ph')) {
+        await signOut(auth);
+        throw new Error("Domain Restricted: Please use your @neu.edu.ph account.");
+      }
     } catch (error) {
       console.error("Error signing in with Google", error);
       throw error;

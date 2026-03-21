@@ -3,11 +3,18 @@
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Status:** ✅ v1.3.0 | GenAI Ready
+**Status:** ✅ v1.3.1 | AI Active
 
 ---
 
 ## 📅 Version History
+
+### v1.3.1 - Google AI Activation
+- **Date:** 2025-02-21
+- **Status:** Integrated live Gemini API Key.
+- **Completed:** 
+  1. Updated `.env` with the official Google AI Studio API Key.
+  2. Verified AI analysis capability in the Admin Dashboard.
 
 ### v1.3.0 - GenAI & AI Studio Integration
 - **Date:** 2025-02-21

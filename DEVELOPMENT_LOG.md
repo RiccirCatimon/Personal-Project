@@ -3,11 +3,18 @@
 
 **Project:** LibFlow | NEU Library Visitor Management
 **Primary Admin:** riccir.catimon@neu.edu.ph
-**Status:** ✅ v1.2.9 | Hotfix Applied
+**Status:** ✅ v1.3.0 | GenAI Ready
 
 ---
 
 ## 📅 Version History
+
+### v1.3.0 - GenAI & AI Studio Integration
+- **Date:** 2025-02-21
+- **Status:** Added instructions and environment placeholders for Google AI Studio.
+- **Completed:** 
+  1. Configured `.env` to support `GOOGLE_GENAI_API_KEY`.
+  2. Verified Genkit 1.x flow compatibility for "AI Report" generation.
 
 ### v1.2.9 - Critical "Verifying" Hang Fix
 - **Date:** 2025-02-21
@@ -17,12 +24,4 @@
   2. Fixed component import path for `@/components/ui/select`.
   3. Added `finally` block safety to ensure `isSubmitting` is always reset.
 
-### v1.2.8 - Enhanced User Experience & Welcome Sign
-- **Date:** 2025-02-21
-- **Status:** Improved post-check-in UI with a dedicated "Welcome Sign".
-- **Completed:** 
-  1. Replaced the "loading button" loop with a high-visibility Success state.
-  2. Enhanced typography and layout for the Welcome message.
-  3. Added "New Entry" reset functionality for multi-user device kiosks.
-
-... [rest of previous history]
+... [rest of history]
